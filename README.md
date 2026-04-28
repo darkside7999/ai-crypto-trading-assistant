@@ -106,6 +106,25 @@ Para quitar los servicios:
 ./scripts/linux/uninstall-systemd-lan.sh
 ```
 
+Si el login muestra `Failed to fetch`, normalmente el frontend esta intentando llamar al backend equivocado. En el servidor ejecuta:
+
+```bash
+grep VITE_API_BASE_URL frontend/.env
+curl http://127.0.0.1:8000/health
+```
+
+Para uso en WiFi, `frontend/.env` debe quedar asi:
+
+```env
+VITE_API_BASE_URL=
+```
+
+Despues reinicia:
+
+```bash
+sudo systemctl restart ai-crypto-backend ai-crypto-frontend
+```
+
 Seguridad recomendada para uso en WiFi:
 
 - Usa una contrasena de admin fuerte en `backend/.env`.

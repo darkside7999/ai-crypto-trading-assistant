@@ -56,6 +56,7 @@ if (-not (Test-Path (Join-Path $Frontend ".env"))) {
 $backendEnv = Join-Path $Backend ".env"
 Set-EnvLine -Path $backendEnv -Key "DATABASE_URL" -Value "sqlite:///./dev_trading.db"
 Set-EnvLine -Path $backendEnv -Key "CORS_ORIGINS" -Value "http://localhost:5173,http://127.0.0.1:5173"
+Set-EnvLine -Path (Join-Path $Frontend ".env") -Key "VITE_API_BASE_URL" -Value ""
 
 $envText = Get-Content -LiteralPath $backendEnv -Raw
 if ($envText -match "ADMIN_PASSWORD=change-this-password") {

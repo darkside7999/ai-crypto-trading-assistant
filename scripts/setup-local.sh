@@ -77,6 +77,7 @@ fi
 
 set_env_line "$BACKEND/.env" "DATABASE_URL" "sqlite:///./dev_trading.db"
 set_env_line "$BACKEND/.env" "CORS_ORIGINS" "http://localhost:5173,http://127.0.0.1:5173"
+set_env_line "$FRONTEND/.env" "VITE_API_BASE_URL" ""
 
 if grep -q '^ADMIN_PASSWORD=change-this-password$' "$BACKEND/.env"; then
   set_env_line "$BACKEND/.env" "ADMIN_PASSWORD" "$(new_secret)"
