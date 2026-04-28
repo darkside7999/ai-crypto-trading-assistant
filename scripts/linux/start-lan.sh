@@ -37,6 +37,7 @@ PY
 }
 
 python_set_env_line "$BACKEND/.env" "DATABASE_URL" "sqlite:///./dev_trading.db"
+python_set_env_line "$BACKEND/.env" "MARKET_DATA_PROVIDER" "kraken_public"
 python_set_env_line "$BACKEND/.env" "CORS_ORIGIN_REGEX" '^http://(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+):5173$'
 python_set_env_line "$FRONTEND/.env" "VITE_API_BASE_URL" ""
 

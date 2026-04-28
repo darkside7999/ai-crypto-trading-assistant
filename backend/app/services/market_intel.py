@@ -5,7 +5,8 @@ from xml.etree import ElementTree
 import httpx
 
 from app.config import get_settings
-from app.services.exchange.binance import BinanceMarketData
+from app.config import get_settings
+from app.services.exchange.binance import get_market_data_client
 
 
 ALLOWED_RSS_HOSTS = {
@@ -37,7 +38,7 @@ def _safe_rss_urls() -> list[str]:
 class MarketIntelService:
     def collect(self, symbols: list[str], include_ohlcv: bool = True) -> dict:
         settings = get_settings()
-        market = BinanceMarketData()
+        market = get_market_data_client()
         tickers = market.fetch_tickers(symbols)
         ticker_payload = [
             {
@@ -63,7 +64,12 @@ class MarketIntelService:
         payload = {
             "generated_at": _now(),
             "sources": [
-                {"name": "Binance via CCXT", "type": "exchange", "url": "https://www.binance.com", "generated_at": _now()}
+                {
+                    "name": f"{settings.market_data_provider} via CCXT",
+                    "type": "exchange",
+                    "url": "https://docs.ccxt.com/",
+                    "generated_at": _now(),
+                }
             ],
             "tickers": ticker_payload,
             "ohlcv": ohlcv_payload,

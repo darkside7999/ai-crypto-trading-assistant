@@ -85,6 +85,7 @@ set_env_line "$BACKEND/.env" "AI_MAX_INPUT_TOKENS" "6000"
 set_env_line "$BACKEND/.env" "AI_MAX_OUTPUT_TOKENS" "800"
 set_env_line "$BACKEND/.env" "AI_TEMPERATURE" "0.1"
 set_env_line "$BACKEND/.env" "MARKET_INTEL_ENABLE_COINGECKO" "true"
+set_env_line "$BACKEND/.env" "MARKET_DATA_PROVIDER" "kraken_public"
 set_env_line "$FRONTEND/.env" "VITE_API_BASE_URL" ""
 
 if grep -q '^ADMIN_PASSWORD=change-this-password$' "$BACKEND/.env"; then

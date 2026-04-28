@@ -249,6 +249,7 @@ Para activarla:
 La IA solo trabaja en demo. Si no hay API key, se supera el limite diario, falla el JSON o faltan datos fiables, registra `WAIT` y no abre operaciones. Las fuentes de internet estan controladas desde backend:
 
 - Binance/CCXT para precio, spread, volumen y OHLCV.
+- Kraken publico por defecto para datos de mercado sin API key.
 - CoinGecko global opcional.
 - RSS solo si configuras URLs permitidas en `MARKET_INTEL_RSS_URLS`.
 
@@ -259,7 +260,15 @@ AI_MAX_CALLS_PER_DAY=200
 AI_MAX_INPUT_TOKENS=6000
 AI_MAX_OUTPUT_TOKENS=800
 AI_TEMPERATURE=0.1
+MARKET_DATA_PROVIDER=kraken_public
 ```
+
+Proveedores de datos soportados sin claves privadas:
+
+- `kraken_public`: recomendado si no tienes API de Binance.
+- `binance_public`: datos publicos de Binance, sin ordenes.
+- `okx_public`: datos publicos de OKX, sin ordenes.
+- `binance_testnet`: solo cuando ya tengas claves testnet de Binance.
 
 Endpoints:
 

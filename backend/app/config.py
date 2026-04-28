@@ -44,6 +44,7 @@ class Settings(BaseSettings):
 
     market_intel_enable_coingecko: bool = True
     market_intel_rss_urls: str = ""
+    market_data_provider: str = "kraken_public"
 
     telegram_bot_token: str | None = None
     telegram_chat_id: str | None = None

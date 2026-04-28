@@ -64,6 +64,7 @@ Set-EnvLine -Path $backendEnv -Key "AI_MAX_INPUT_TOKENS" -Value "6000"
 Set-EnvLine -Path $backendEnv -Key "AI_MAX_OUTPUT_TOKENS" -Value "800"
 Set-EnvLine -Path $backendEnv -Key "AI_TEMPERATURE" -Value "0.1"
 Set-EnvLine -Path $backendEnv -Key "MARKET_INTEL_ENABLE_COINGECKO" -Value "true"
+Set-EnvLine -Path $backendEnv -Key "MARKET_DATA_PROVIDER" -Value "kraken_public"
 Set-EnvLine -Path (Join-Path $Frontend ".env") -Key "VITE_API_BASE_URL" -Value ""
 
 $envText = Get-Content -LiteralPath $backendEnv -Raw

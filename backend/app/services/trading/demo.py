@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from sqlmodel import Session, select
 
 from app.models.db import AiDecision, BotState, ExchangeOrder, RiskSettings, Trade, TradeStatus
-from app.services.exchange.binance import BinanceMarketData, MarketTicker
+from app.services.exchange.binance import MarketTicker, get_market_data_client
 from app.services.logging import log_event
 from app.services.risk.engine import RiskEngine, TradeProposal
 
@@ -44,7 +44,7 @@ class DemoTradingService:
         if not state.enabled:
             return {"status": "skipped", "reason": "bot_disabled"}
 
-        tickers = BinanceMarketData().fetch_tickers(settings.allowed_symbols)
+        tickers = get_market_data_client().fetch_tickers(settings.allowed_symbols)
         candidate = self._select_candidate(tickers, settings)
         if candidate is None:
             decision = AiDecision(action="WAIT", reason="Not enough reliable data", raw_response={"source": "rules_v1"})
@@ -178,7 +178,7 @@ class DemoTradingService:
         open_trades = session.exec(select(Trade).where(Trade.status == TradeStatus.OPEN)).all()
         if not open_trades:
             return
-        tickers = {ticker.symbol: ticker for ticker in BinanceMarketData().fetch_tickers([trade.symbol for trade in open_trades])}
+        tickers = {ticker.symbol: ticker for ticker in get_market_data_client().fetch_tickers([trade.symbol for trade in open_trades])}
         for trade in open_trades:
             ticker = tickers.get(trade.symbol)
             if not ticker or not trade.entry_price:
