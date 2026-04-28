@@ -57,6 +57,62 @@ Servicios:
 - Backend: http://127.0.0.1:8000
 - API docs: http://127.0.0.1:8000/docs
 
+## Servidor para toda tu WiFi en Linux Mint
+
+Para dejarlo corriendo en un servidor y abrirlo desde cualquier PC/movil de tu red WiFi:
+
+```bash
+chmod +x scripts/*.sh scripts/linux/*.sh
+./scripts/linux/install-systemd-lan.sh
+```
+
+El instalador hace esto:
+
+- Usa SQLite local en `backend/dev_trading.db`.
+- Configura el frontend para llamar automaticamente a la IP del servidor.
+- Arranca el backend en `0.0.0.0:8000`.
+- Arranca el frontend en `0.0.0.0:5173`.
+- Crea servicios `systemd`:
+  - `ai-crypto-backend.service`
+  - `ai-crypto-frontend.service`
+- Activa reinicio automatico con `Restart=always`.
+- Espera a `network-online.target`, util si el servidor reinicia o pierde WiFi.
+- Si `ufw` existe, abre los puertos solo para rangos privados LAN.
+
+Para ver la URL del servidor:
+
+```bash
+hostname -I
+```
+
+Abre desde tu PC:
+
+```text
+http://IP_DEL_SERVIDOR:5173
+```
+
+Comandos utiles:
+
+```bash
+./scripts/linux/status-systemd-lan.sh
+sudo systemctl restart ai-crypto-backend ai-crypto-frontend
+journalctl -u ai-crypto-backend -f
+journalctl -u ai-crypto-frontend -f
+```
+
+Para quitar los servicios:
+
+```bash
+./scripts/linux/uninstall-systemd-lan.sh
+```
+
+Seguridad recomendada para uso en WiFi:
+
+- Usa una contrasena de admin fuerte en `backend/.env`.
+- No abras los puertos 5173/8000 en el router hacia internet.
+- Manten el modo `REAL` desactivado; en Fase 1 sigue bloqueado por API.
+- Si cambias de red WiFi, revisa la IP con `hostname -I`.
+
 ## Ejecutar sin Docker en Windows
 
 La forma mas sencilla:

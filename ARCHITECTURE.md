@@ -25,6 +25,7 @@ Esta Fase 1 implementa solo paper trading y funciona sin Docker usando SQLite lo
 - `frontend/src/pages/Dashboard.jsx`: dashboard operativo con estado, switches, riesgo, operaciones, historial, decisiones y logs.
 - `scripts/*.ps1` y `scripts/*.bat`: instalacion y arranque local en Windows sin Docker.
 - `scripts/*.sh`: instalacion y arranque local en Linux Mint sin Docker.
+- `scripts/linux/install-systemd-lan.sh`: instala servicios `systemd` para exponer la app en la red WiFi y reiniciarla automaticamente.
 
 ## Modelo de datos principal
 

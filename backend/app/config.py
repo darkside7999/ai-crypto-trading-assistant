@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     api_port: int = 8000
     database_url: str = "sqlite:///./trading.db"
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    cors_origin_regex: str | None = (
+        r"^http://(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|"
+        r"192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+):5173$"
+    )
 
     admin_username: str = "admin"
     admin_password: str = "change-this-password"
@@ -41,6 +45,11 @@ class Settings(BaseSettings):
     @classmethod
     def force_demo_default(cls, value: str) -> str:
         return "DEMO" if value != "DEMO" else value
+
+    @field_validator("cors_origin_regex")
+    @classmethod
+    def empty_regex_to_none(cls, value: str | None) -> str | None:
+        return value or None
 
     @property
     def cors_origin_list(self) -> list[str]:
