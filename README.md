@@ -95,10 +95,23 @@ Comandos utiles:
 
 ```bash
 ./scripts/linux/status-systemd-lan.sh
+./scripts/linux/check-lan-ports.sh
+./scripts/linux/open-lan-ports.sh
+./scripts/linux/restart-systemd-lan.sh
 sudo systemctl restart ai-crypto-backend ai-crypto-frontend
 journalctl -u ai-crypto-backend -f
 journalctl -u ai-crypto-frontend -f
 ```
+
+Si los servicios no arrancan porque los puertos `8000` o `5173` estan ocupados:
+
+```bash
+./scripts/linux/free-lan-ports.sh
+./scripts/linux/free-lan-ports.sh --kill
+./scripts/linux/restart-systemd-lan.sh
+```
+
+El primer comando solo muestra que procesos ocupan los puertos. El segundo los para de forma explicita.
 
 Para quitar los servicios:
 

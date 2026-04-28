@@ -26,6 +26,7 @@ Esta Fase 1 implementa solo paper trading y funciona sin Docker usando SQLite lo
 - `scripts/*.ps1` y `scripts/*.bat`: instalacion y arranque local en Windows sin Docker.
 - `scripts/*.sh`: instalacion y arranque local en Linux Mint sin Docker.
 - `scripts/linux/install-systemd-lan.sh`: instala servicios `systemd` para exponer la app en la red WiFi y reiniciarla automaticamente.
+- `scripts/linux/restart-systemd-lan.sh`, `check-lan-ports.sh`, `open-lan-ports.sh` y `free-lan-ports.sh`: mantenimiento operativo de servicios, puertos y firewall LAN.
 
 ## Modelo de datos principal
 
