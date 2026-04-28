@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.database import init_db
-from app.routes import ai, auth, bot, logs, settings as settings_router, telegram, trades
+from app.routes import ai, auth, bot, logs, market, settings as settings_router, telegram, trades
 from app.workers.scheduler import start_scheduler
 
 
@@ -35,6 +35,7 @@ app.include_router(trades.router)
 app.include_router(ai.router)
 app.include_router(logs.router)
 app.include_router(telegram.router)
+app.include_router(market.router)
 
 
 @app.get("/health")

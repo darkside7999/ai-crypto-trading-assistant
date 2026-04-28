@@ -228,6 +228,63 @@ docker compose up --build
 6. Si el modo es `MANUAL`, confirma la compra desde la tabla de operaciones.
 7. Revisa historial, decisiones y logs.
 
+## IA demo con bajo coste
+
+La app esta preparada para usar OpenRouter con Gemini 2.5 Flash-Lite como modelo principal:
+
+```env
+AI_PROVIDER=openrouter
+AI_MODEL=google/gemini-2.5-flash-lite
+AI_FALLBACK_MODEL=deepseek/deepseek-chat-v3.1
+AI_ENABLED=false
+OPENROUTER_API_KEY=
+```
+
+Para activarla:
+
+1. Pon tu `OPENROUTER_API_KEY` en `backend/.env`.
+2. Reinicia el backend.
+3. En el dashboard activa `IA ON` en el panel `IA y datos`.
+
+La IA solo trabaja en demo. Si no hay API key, se supera el limite diario, falla el JSON o faltan datos fiables, registra `WAIT` y no abre operaciones. Las fuentes de internet estan controladas desde backend:
+
+- Binance/CCXT para precio, spread, volumen y OHLCV.
+- CoinGecko global opcional.
+- RSS solo si configuras URLs permitidas en `MARKET_INTEL_RSS_URLS`.
+
+Costes configurados por defecto:
+
+```env
+AI_MAX_CALLS_PER_DAY=200
+AI_MAX_INPUT_TOKENS=6000
+AI_MAX_OUTPUT_TOKENS=800
+AI_TEMPERATURE=0.1
+```
+
+Endpoints:
+
+- `GET /market/intel`
+- `POST /ai/analyze`
+- `GET /ai/costs`
+- `GET /ai/settings`
+- `PUT /ai/settings`
+
+## Actualizar sin borrar ni reclonar
+
+En Linux Mint, dentro de la carpeta del proyecto:
+
+```bash
+./scripts/linux/update-app.sh
+```
+
+Comando manual equivalente:
+
+```bash
+git pull --ff-only && ./scripts/setup-local.sh && npm --prefix frontend run build && sudo systemctl restart ai-crypto-backend ai-crypto-frontend && ./scripts/linux/check-lan-ports.sh
+```
+
+El actualizador no borra `.env`, no borra SQLite y no reclona el repositorio.
+
 ## Endpoints principales
 
 - `POST /auth/login`
@@ -247,6 +304,9 @@ docker compose up --build
 - `POST /trades/{id}/confirm-sell`
 - `POST /trades/{id}/convert-long-term`
 - `GET /ai/decisions`
+- `POST /ai/analyze`
+- `GET /ai/costs`
+- `GET /market/intel`
 - `GET /logs`
 - `POST /telegram/test`
 

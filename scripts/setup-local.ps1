@@ -56,6 +56,14 @@ if (-not (Test-Path (Join-Path $Frontend ".env"))) {
 $backendEnv = Join-Path $Backend ".env"
 Set-EnvLine -Path $backendEnv -Key "DATABASE_URL" -Value "sqlite:///./dev_trading.db"
 Set-EnvLine -Path $backendEnv -Key "CORS_ORIGINS" -Value "http://localhost:5173,http://127.0.0.1:5173"
+Set-EnvLine -Path $backendEnv -Key "AI_PROVIDER" -Value "openrouter"
+Set-EnvLine -Path $backendEnv -Key "AI_MODEL" -Value "google/gemini-2.5-flash-lite"
+Set-EnvLine -Path $backendEnv -Key "AI_FALLBACK_MODEL" -Value "deepseek/deepseek-chat-v3.1"
+Set-EnvLine -Path $backendEnv -Key "AI_MAX_CALLS_PER_DAY" -Value "200"
+Set-EnvLine -Path $backendEnv -Key "AI_MAX_INPUT_TOKENS" -Value "6000"
+Set-EnvLine -Path $backendEnv -Key "AI_MAX_OUTPUT_TOKENS" -Value "800"
+Set-EnvLine -Path $backendEnv -Key "AI_TEMPERATURE" -Value "0.1"
+Set-EnvLine -Path $backendEnv -Key "MARKET_INTEL_ENABLE_COINGECKO" -Value "true"
 Set-EnvLine -Path (Join-Path $Frontend ".env") -Key "VITE_API_BASE_URL" -Value ""
 
 $envText = Get-Content -LiteralPath $backendEnv -Raw

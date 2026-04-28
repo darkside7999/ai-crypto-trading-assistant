@@ -77,6 +77,14 @@ fi
 
 set_env_line "$BACKEND/.env" "DATABASE_URL" "sqlite:///./dev_trading.db"
 set_env_line "$BACKEND/.env" "CORS_ORIGINS" "http://localhost:5173,http://127.0.0.1:5173"
+set_env_line "$BACKEND/.env" "AI_PROVIDER" "openrouter"
+set_env_line "$BACKEND/.env" "AI_MODEL" "google/gemini-2.5-flash-lite"
+set_env_line "$BACKEND/.env" "AI_FALLBACK_MODEL" "deepseek/deepseek-chat-v3.1"
+set_env_line "$BACKEND/.env" "AI_MAX_CALLS_PER_DAY" "200"
+set_env_line "$BACKEND/.env" "AI_MAX_INPUT_TOKENS" "6000"
+set_env_line "$BACKEND/.env" "AI_MAX_OUTPUT_TOKENS" "800"
+set_env_line "$BACKEND/.env" "AI_TEMPERATURE" "0.1"
+set_env_line "$BACKEND/.env" "MARKET_INTEL_ENABLE_COINGECKO" "true"
 set_env_line "$FRONTEND/.env" "VITE_API_BASE_URL" ""
 
 if grep -q '^ADMIN_PASSWORD=change-this-password$' "$BACKEND/.env"; then

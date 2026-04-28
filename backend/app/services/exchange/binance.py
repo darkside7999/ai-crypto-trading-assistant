@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime, timezone
 
 from app.config import get_settings
 
@@ -49,3 +50,17 @@ class BinanceMarketData:
                 )
             )
         return tickers
+
+    def fetch_ohlcv(self, symbol: str, timeframe: str = "5m", limit: int = 50) -> list[dict[str, float | str]]:
+        candles = self.exchange.fetch_ohlcv(symbol, timeframe=timeframe, limit=limit)
+        return [
+            {
+                "timestamp": datetime.fromtimestamp(row[0] / 1000, tz=timezone.utc).isoformat(),
+                "open": float(row[1]),
+                "high": float(row[2]),
+                "low": float(row[3]),
+                "close": float(row[4]),
+                "volume": float(row[5]),
+            }
+            for row in candles
+        ]

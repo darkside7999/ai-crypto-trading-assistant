@@ -1,4 +1,4 @@
-import { Activity, Bell, Bot, Pause, Play, RefreshCw, Shield, TestTube2 } from "lucide-react";
+import { Activity, Bell, Bot, BrainCircuit, DatabaseZap, RefreshCw, Shield, TestTube2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import Panel from "../components/Panel";
@@ -29,19 +29,24 @@ export default function Dashboard() {
   const [history, setHistory] = useState([]);
   const [decisions, setDecisions] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [aiSettings, setAiSettings] = useState(null);
+  const [aiCosts, setAiCosts] = useState(null);
+  const [marketIntel, setMarketIntel] = useState(null);
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function loadAll() {
     setLoading(true);
     try {
-      const [nextStatus, nextSettings, nextOpen, nextHistory, nextDecisions, nextLogs] = await Promise.all([
+      const [nextStatus, nextSettings, nextOpen, nextHistory, nextDecisions, nextLogs, nextAiSettings, nextAiCosts] = await Promise.all([
         api.status(),
         api.riskSettings(),
         api.openTrades(),
         api.history(),
         api.decisions(),
-        api.logs()
+        api.logs(),
+        api.aiSettings(),
+        api.aiCosts()
       ]);
       setStatus(nextStatus);
       setSettings(nextSettings);
@@ -49,6 +54,8 @@ export default function Dashboard() {
       setHistory(nextHistory);
       setDecisions(nextDecisions);
       setLogs(nextLogs);
+      setAiSettings(nextAiSettings);
+      setAiCosts(nextAiCosts);
     } catch (err) {
       setNotice(err.message);
     } finally {
@@ -88,6 +95,7 @@ export default function Dashboard() {
   }
 
   const stat = status || { enabled: false, trading_mode: "DEMO", control_mode: "MANUAL", open_trades: 0 };
+  const latestDecision = decisions[0];
 
   return (
     <main className="min-h-screen bg-[#f6f8f7]">
@@ -171,6 +179,71 @@ export default function Dashboard() {
               <button className="focus-ring w-full bg-pine px-3 py-2 font-semibold text-white" onClick={() => run(() => api.updateRiskSettings(settings))}>
                 Guardar riesgo
               </button>
+            </div>
+          </Panel>
+
+          <Panel title="IA y datos">
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="border border-slate-200 p-3">
+                  <div className="mb-1 flex items-center gap-2 text-slate-500"><BrainCircuit size={15} /> IA demo</div>
+                  <strong className={aiSettings?.enabled ? "text-pine" : "text-slate-600"}>{aiSettings?.enabled ? "ON" : "OFF"}</strong>
+                </div>
+                <div className="border border-slate-200 p-3">
+                  <div className="mb-1 text-slate-500">API key</div>
+                  <strong className={aiSettings?.configured ? "text-pine" : "text-coral"}>{aiSettings?.configured ? "OK" : "Falta"}</strong>
+                </div>
+              </div>
+              <div className="border border-slate-200 p-3 text-xs text-slate-600">
+                <div><strong>Modelo:</strong> {aiSettings?.model || "-"}</div>
+                <div><strong>Fallback:</strong> {aiSettings?.fallback_model || "-"}</div>
+                <div><strong>Uso hoy:</strong> {aiCosts?.calls_used_today ?? 0}/{aiCosts?.max_calls_per_day ?? 0} llamadas</div>
+                <div><strong>Coste est.:</strong> ${Number(aiCosts?.estimated_cost_today_usd || 0).toFixed(6)}</div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <SwitchButton
+                  active={Boolean(aiSettings?.enabled)}
+                  label="IA ON"
+                  disabled={!aiSettings?.configured}
+                  onClick={() => run(() => api.updateAiSettings({ enabled: true }))}
+                />
+                <SwitchButton
+                  active={!aiSettings?.enabled}
+                  label="IA OFF"
+                  tone="coral"
+                  onClick={() => run(() => api.updateAiSettings({ enabled: false }))}
+                />
+              </div>
+              <button className="focus-ring inline-flex w-full items-center justify-center gap-2 border border-slate-300 bg-white px-3 py-2 font-semibold" onClick={() => run(() => api.aiAnalyze({}))}>
+                <BrainCircuit size={16} /> Analizar con IA
+              </button>
+              <button
+                className="focus-ring inline-flex w-full items-center justify-center gap-2 border border-slate-300 bg-white px-3 py-2 font-semibold"
+                onClick={() => run(async () => {
+                  const intel = await api.marketIntel();
+                  setMarketIntel(intel);
+                  return { message: "Datos de mercado actualizados" };
+                })}
+              >
+                <DatabaseZap size={16} /> Datos mercado
+              </button>
+              {latestDecision && (
+                <div className="border border-slate-200 p-3 text-xs">
+                  <div className="mb-1 font-semibold">{latestDecision.action} {latestDecision.symbol || ""}</div>
+                  <p className="text-slate-600">{latestDecision.reason}</p>
+                </div>
+              )}
+              {marketIntel && (
+                <div className="max-h-40 overflow-auto border border-slate-200 p-3 text-xs text-slate-600">
+                  <div className="mb-2 font-semibold text-slate-700">Intel {new Date(marketIntel.generated_at).toLocaleTimeString()}</div>
+                  {(marketIntel.tickers || []).slice(0, 5).map((ticker) => (
+                    <div key={ticker.symbol} className="flex justify-between border-b border-slate-100 py-1">
+                      <span>{ticker.symbol}</span>
+                      <span>{Number(ticker.last).toFixed(4)} · spread {Number(ticker.spread_pct).toFixed(3)}%</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </Panel>
         </aside>

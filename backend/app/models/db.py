@@ -153,3 +153,21 @@ class LogEntry(SQLModel, table=True):
     message: str
     context: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
     created_at: datetime = Field(default_factory=utc_now)
+
+
+class AppSetting(SQLModel, table=True):
+    key: str = Field(primary_key=True)
+    value: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+    updated_at: datetime = Field(default_factory=utc_now)
+
+
+class AiUsage(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    provider: str = "openrouter"
+    model: str
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    estimated_cost_usd: float = 0.0
+    success: bool = False
+    reason: str | None = None
+    created_at: datetime = Field(default_factory=utc_now)

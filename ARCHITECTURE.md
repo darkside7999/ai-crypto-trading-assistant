@@ -27,6 +27,7 @@ Esta Fase 1 implementa solo paper trading y funciona sin Docker usando SQLite lo
 - `scripts/*.sh`: instalacion y arranque local en Linux Mint sin Docker.
 - `scripts/linux/install-systemd-lan.sh`: instala servicios `systemd` para exponer la app en la red WiFi y reiniciarla automaticamente.
 - `scripts/linux/restart-systemd-lan.sh`, `check-lan-ports.sh`, `open-lan-ports.sh` y `free-lan-ports.sh`: mantenimiento operativo de servicios, puertos y firewall LAN.
+- `scripts/linux/update-app.sh`: actualizacion por `git pull --ff-only` sin borrar `.env`, SQLite ni reclonar.
 
 ## Modelo de datos principal
 
@@ -57,6 +58,7 @@ Esta Fase 1 implementa solo paper trading y funciona sin Docker usando SQLite lo
 ## Fases siguientes
 
 - Fase 2: integrar OpenRouter/NVIDIA, parseo estricto JSON y confirmacion manual por dashboard/Telegram.
+- Fase 2 parcial implementada: OpenRouter con Gemini 2.5 Flash-Lite, fallback DeepSeek V3.1, JSON estricto, costes diarios, datos de mercado controlados y switch IA demo.
 - Fase 3: autonomo demo completo, backtesting simple y reglas de salida mas ricas.
 - Fase 4: Binance real protegido, confirmacion fuerte persistente, limites diarios estrictos y permisos minimos.
 - Fase 5: Kraken, largo plazo separado, estadisticas avanzadas.

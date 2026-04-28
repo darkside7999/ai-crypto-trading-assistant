@@ -53,32 +53,65 @@ class DemoTradingService:
             log_event(session, "decision.wait", "No market candidate passed the initial filters")
             return {"status": "wait", "reason": "no_candidate"}
 
+        ai_decision = None
+        try:
+            from app.services.ai.openrouter import OpenRouterAiService, ai_setting_enabled
+
+            if ai_setting_enabled(session):
+                ai_decision, ai_usage = OpenRouterAiService().analyze(session)
+                if ai_decision.action != "BUY":
+                    log_event(
+                        session,
+                        "ai.no_trade",
+                        "AI did not recommend a demo buy",
+                        context={"action": ai_decision.action, "reason": ai_decision.reason, "usage": ai_usage},
+                    )
+                    return {"status": "wait", "reason": ai_decision.reason}
+                ticker_by_symbol = {ticker.symbol: ticker for ticker in tickers}
+                if ai_decision.symbol not in ticker_by_symbol:
+                    log_event(
+                        session,
+                        "ai.symbol_rejected",
+                        "AI recommended a symbol outside collected market data",
+                        context={"symbol": ai_decision.symbol},
+                    )
+                    return {"status": "rejected", "reason": "ai_symbol_not_available"}
+                candidate = ticker_by_symbol[ai_decision.symbol]
+        except Exception as exc:
+            log_event(session, "ai.cycle_error", "AI analysis failed during demo cycle", level="ERROR", context={"error": str(exc)})
+            return {"status": "wait", "reason": "ai_cycle_error"}
+
         proposal = self._build_proposal(candidate, settings)
-        decision = AiDecision(
-            provider="rules_v1",
-            action="BUY",
-            symbol=proposal.symbol,
-            confidence=0.55,
-            reason=proposal.reason,
-            risk_level="MEDIUM",
-            expected_net_profit=proposal.expected_net_profit,
-            max_acceptable_loss=settings.max_loss_per_trade_eur,
-            requires_user_confirmation=state.control_mode == "MANUAL",
-            raw_response={
-                "action": "BUY",
-                "symbol": proposal.symbol,
-                "confidence": 0.55,
-                "reason": proposal.reason,
-                "risk_level": "MEDIUM",
-                "expected_net_profit": proposal.expected_net_profit,
-                "max_acceptable_loss": settings.max_loss_per_trade_eur,
-                "time_horizon": "scalp",
-                "requires_user_confirmation": state.control_mode == "MANUAL",
-            },
-        )
-        session.add(decision)
-        session.commit()
-        session.refresh(decision)
+        if ai_decision:
+            decision = ai_decision
+            proposal.reason = f"AI demo: {ai_decision.reason}"
+            proposal.expected_net_profit = min(proposal.expected_net_profit, ai_decision.expected_net_profit or proposal.expected_net_profit)
+        else:
+            decision = AiDecision(
+                provider="rules_v1",
+                action="BUY",
+                symbol=proposal.symbol,
+                confidence=0.55,
+                reason=proposal.reason,
+                risk_level="MEDIUM",
+                expected_net_profit=proposal.expected_net_profit,
+                max_acceptable_loss=settings.max_loss_per_trade_eur,
+                requires_user_confirmation=state.control_mode == "MANUAL",
+                raw_response={
+                    "action": "BUY",
+                    "symbol": proposal.symbol,
+                    "confidence": 0.55,
+                    "reason": proposal.reason,
+                    "risk_level": "MEDIUM",
+                    "expected_net_profit": proposal.expected_net_profit,
+                    "max_acceptable_loss": settings.max_loss_per_trade_eur,
+                    "time_horizon": "scalp",
+                    "requires_user_confirmation": state.control_mode == "MANUAL",
+                },
+            )
+            session.add(decision)
+            session.commit()
+            session.refresh(decision)
 
         risk_result = self.risk.validate_buy(session, state, settings, proposal)
         if not risk_result.accepted:

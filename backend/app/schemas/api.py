@@ -103,3 +103,43 @@ class LogRead(BaseModel):
 
 class MessageResponse(BaseModel):
     message: str
+
+
+class AiSettingsRead(BaseModel):
+    enabled: bool
+    provider: str
+    configured: bool
+    model: str
+    fallback_model: str
+    max_calls_per_day: int
+    max_input_tokens: int
+    max_output_tokens: int
+    temperature: float
+
+
+class AiSettingsUpdate(BaseModel):
+    enabled: bool
+
+
+class AiAnalyzeRequest(BaseModel):
+    symbol: str | None = None
+    use_fallback: bool = False
+
+
+class AiAnalyzeResponse(BaseModel):
+    decision: AiDecisionRead
+    usage: dict[str, Any]
+
+
+class AiCostsResponse(BaseModel):
+    enabled: bool
+    configured: bool
+    model: str
+    fallback_model: str
+    calls_used_today: int
+    max_calls_per_day: int
+    prompt_tokens_today: int
+    completion_tokens_today: int
+    estimated_cost_today_usd: float
+    input_price_per_million: float
+    output_price_per_million: float

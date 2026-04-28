@@ -34,6 +34,16 @@ class Settings(BaseSettings):
     openrouter_api_key: str | None = None
     nvidia_api_key: str | None = None
     ai_provider: str = "disabled"
+    ai_enabled: bool = False
+    ai_model: str = "google/gemini-2.5-flash-lite"
+    ai_fallback_model: str = "deepseek/deepseek-chat-v3.1"
+    ai_max_calls_per_day: int = 200
+    ai_max_input_tokens: int = 6000
+    ai_max_output_tokens: int = 800
+    ai_temperature: float = 0.1
+
+    market_intel_enable_coingecko: bool = True
+    market_intel_rss_urls: str = ""
 
     telegram_bot_token: str | None = None
     telegram_chat_id: str | None = None
@@ -54,6 +64,10 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    @property
+    def market_intel_rss_url_list(self) -> list[str]:
+        return [url.strip() for url in self.market_intel_rss_urls.split(",") if url.strip()]
 
 
 @lru_cache

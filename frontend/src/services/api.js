@@ -49,5 +49,10 @@ export const api = {
   convertLongTerm: (id) => request(`/trades/${id}/convert-long-term`, { method: "POST" }),
   decisions: () => request("/ai/decisions"),
   logs: () => request("/logs"),
-  telegramTest: () => request("/telegram/test", { method: "POST" })
+  telegramTest: () => request("/telegram/test", { method: "POST" }),
+  aiSettings: () => request("/ai/settings"),
+  updateAiSettings: (settings) => request("/ai/settings", { method: "PUT", body: JSON.stringify(settings) }),
+  aiCosts: () => request("/ai/costs"),
+  aiAnalyze: (payload = {}) => request("/ai/analyze", { method: "POST", body: JSON.stringify(payload) }),
+  marketIntel: () => request("/market/intel")
 };
