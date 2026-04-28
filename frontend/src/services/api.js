@@ -52,7 +52,13 @@ export const api = {
   telegramTest: () => request("/telegram/test", { method: "POST" }),
   aiSettings: () => request("/ai/settings"),
   updateAiSettings: (settings) => request("/ai/settings", { method: "PUT", body: JSON.stringify(settings) }),
+  aiModels: () => request("/ai/models"),
   aiCosts: () => request("/ai/costs"),
   aiAnalyze: (payload = {}) => request("/ai/analyze", { method: "POST", body: JSON.stringify(payload) }),
+  aiSessions: () => request("/ai/sessions"),
+  createAiSession: (title) => request("/ai/sessions", { method: "POST", body: JSON.stringify({ title }) }),
+  activateAiSession: (id) => request(`/ai/sessions/${id}/activate`, { method: "POST" }),
+  aiMemory: () => request("/ai/memory"),
+  createAiMemory: (content, sessionId = null) => request("/ai/memory", { method: "POST", body: JSON.stringify({ content, session_id: sessionId }) }),
   marketIntel: () => request("/market/intel")
 };

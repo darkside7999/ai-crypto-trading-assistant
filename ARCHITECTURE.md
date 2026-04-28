@@ -58,7 +58,7 @@ Esta Fase 1 implementa solo paper trading y funciona sin Docker usando SQLite lo
 ## Fases siguientes
 
 - Fase 2: integrar OpenRouter/NVIDIA, parseo estricto JSON y confirmacion manual por dashboard/Telegram.
-- Fase 2 parcial implementada: OpenRouter con Gemini 2.5 Flash-Lite, fallback DeepSeek V3.1, JSON estricto, costes diarios, datos de mercado controlados y switch IA demo.
+- Fase 2 parcial implementada: OpenRouter/Ollama seleccionables, Qwen3 235B free por defecto, fallback configurable, JSON estricto, cola de analisis, sesiones, memoria ligera, costes diarios, datos de mercado controlados y switch IA demo.
 - Fase 3: autonomo demo completo, backtesting simple y reglas de salida mas ricas.
 - Fase 4: Binance real protegido, confirmacion fuerte persistente, limites diarios estrictos y permisos minimos.
 - Fase 5: Kraken, largo plazo separado, estadisticas avanzadas.

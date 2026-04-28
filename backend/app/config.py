@@ -35,12 +35,15 @@ class Settings(BaseSettings):
     nvidia_api_key: str | None = None
     ai_provider: str = "disabled"
     ai_enabled: bool = False
-    ai_model: str = "google/gemini-2.5-flash-lite"
-    ai_fallback_model: str = "deepseek/deepseek-chat-v3.1"
+    ai_model: str = "qwen/qwen3-235b-a22b:free"
+    ai_fallback_model: str = "google/gemini-2.5-flash-lite"
     ai_max_calls_per_day: int = 200
     ai_max_input_tokens: int = 6000
     ai_max_output_tokens: int = 800
     ai_temperature: float = 0.1
+    ai_queue_wait_seconds: int = 180
+    ollama_base_url: str = "http://127.0.0.1:11434"
+    ollama_model: str = "qwen3:8b"
 
     market_intel_enable_coingecko: bool = True
     market_intel_rss_urls: str = ""

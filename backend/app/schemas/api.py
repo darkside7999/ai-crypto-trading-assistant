@@ -111,6 +111,9 @@ class AiSettingsRead(BaseModel):
     configured: bool
     model: str
     fallback_model: str
+    active_session_id: int | None = None
+    ollama_base_url: str
+    ollama_model: str
     max_calls_per_day: int
     max_input_tokens: int
     max_output_tokens: int
@@ -118,7 +121,11 @@ class AiSettingsRead(BaseModel):
 
 
 class AiSettingsUpdate(BaseModel):
-    enabled: bool
+    enabled: bool | None = None
+    provider: str | None = None
+    model: str | None = None
+    fallback_model: str | None = None
+    active_session_id: int | None = None
 
 
 class AiAnalyzeRequest(BaseModel):
@@ -143,3 +150,48 @@ class AiCostsResponse(BaseModel):
     estimated_cost_today_usd: float
     input_price_per_million: float
     output_price_per_million: float
+
+
+class AiModelOption(BaseModel):
+    id: str
+    provider: str
+    label: str
+    cost_tier: str
+    input_price_per_million: float
+    output_price_per_million: float
+    strength_for_trading: str
+    notes: str
+
+
+class AiSessionRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str
+    summary: str
+    active: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+class AiSessionCreate(BaseModel):
+    title: str = "Nueva sesion"
+
+
+class AiMemoryRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    session_id: int | None
+    content: str
+    source: str
+    confidence: float
+    active: bool
+    created_at: datetime
+
+
+class AiMemoryCreate(BaseModel):
+    content: str
+    session_id: int | None = None
+    source: str = "manual"
+    confidence: float = 0.7

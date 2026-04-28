@@ -230,14 +230,16 @@ docker compose up --build
 
 ## IA demo con bajo coste
 
-La app esta preparada para usar OpenRouter con Gemini 2.5 Flash-Lite como modelo principal:
+La app esta preparada para usar OpenRouter y Ollama. Por defecto usa un modelo gratuito potente de OpenRouter:
 
 ```env
 AI_PROVIDER=openrouter
-AI_MODEL=google/gemini-2.5-flash-lite
-AI_FALLBACK_MODEL=deepseek/deepseek-chat-v3.1
+AI_MODEL=qwen/qwen3-235b-a22b:free
+AI_FALLBACK_MODEL=google/gemini-2.5-flash-lite
 AI_ENABLED=false
 OPENROUTER_API_KEY=
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+OLLAMA_MODEL=qwen3:8b
 ```
 
 Para activarla:
@@ -270,6 +272,26 @@ Proveedores de datos soportados sin claves privadas:
 - `okx_public`: datos publicos de OKX, sin ordenes.
 - `binance_testnet`: solo cuando ya tengas claves testnet de Binance.
 
+Modelos disponibles desde el menu:
+
+- `qwen/qwen3-235b-a22b:free`: recomendado gratis potente; puede tener rate limits.
+- `deepseek/deepseek-r1-0528:free`: gratis, fuerte en razonamiento, a veces mas lento.
+- `google/gemini-2.5-flash-lite`: muy barato y estable para decisiones frecuentes.
+- `deepseek/deepseek-chat-v3.1`: barato, buen fallback de analisis.
+- `ollama:qwen3:8b`: local con Ollama, coste cero de API; calidad depende de tu hardware/modelo.
+
+El dashboard permite cambiar modelo principal/fallback, crear sesiones nuevas para no saturar contexto y guardar memorias ligeras. La app no deja que el modelo navegue libremente: recibe datos ya filtrados por backend.
+
+## Binance sin secret
+
+Una API key de Binance sin `secret` sirve como maximo para datos publicos o usos no firmados. Para Binance Spot Testnet con ordenes hace falta `API key + secret`, porque las ordenes requieren firma. Mientras no tengas secret, usa:
+
+```env
+MARKET_DATA_PROVIDER=kraken_public
+```
+
+Con eso puedes seguir en paper trading demo sin tocar dinero real ni depender de Binance.
+
 Endpoints:
 
 - `GET /market/intel`
@@ -277,6 +299,12 @@ Endpoints:
 - `GET /ai/costs`
 - `GET /ai/settings`
 - `PUT /ai/settings`
+- `GET /ai/models`
+- `GET /ai/sessions`
+- `POST /ai/sessions`
+- `POST /ai/sessions/{id}/activate`
+- `GET /ai/memory`
+- `POST /ai/memory`
 
 ## Actualizar sin borrar ni reclonar
 

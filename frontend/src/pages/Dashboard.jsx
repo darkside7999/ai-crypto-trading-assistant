@@ -31,14 +31,30 @@ export default function Dashboard() {
   const [logs, setLogs] = useState([]);
   const [aiSettings, setAiSettings] = useState(null);
   const [aiCosts, setAiCosts] = useState(null);
+  const [aiModels, setAiModels] = useState([]);
+  const [aiSessions, setAiSessions] = useState([]);
+  const [aiMemory, setAiMemory] = useState([]);
   const [marketIntel, setMarketIntel] = useState(null);
+  const [newMemory, setNewMemory] = useState("");
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function loadAll() {
     setLoading(true);
     try {
-      const [nextStatus, nextSettings, nextOpen, nextHistory, nextDecisions, nextLogs, nextAiSettings, nextAiCosts] = await Promise.all([
+      const [
+        nextStatus,
+        nextSettings,
+        nextOpen,
+        nextHistory,
+        nextDecisions,
+        nextLogs,
+        nextAiSettings,
+        nextAiCosts,
+        nextAiModels,
+        nextAiSessions,
+        nextAiMemory
+      ] = await Promise.all([
         api.status(),
         api.riskSettings(),
         api.openTrades(),
@@ -46,7 +62,10 @@ export default function Dashboard() {
         api.decisions(),
         api.logs(),
         api.aiSettings(),
-        api.aiCosts()
+        api.aiCosts(),
+        api.aiModels(),
+        api.aiSessions(),
+        api.aiMemory()
       ]);
       setStatus(nextStatus);
       setSettings(nextSettings);
@@ -56,6 +75,9 @@ export default function Dashboard() {
       setLogs(nextLogs);
       setAiSettings(nextAiSettings);
       setAiCosts(nextAiCosts);
+      setAiModels(nextAiModels);
+      setAiSessions(nextAiSessions);
+      setAiMemory(nextAiMemory);
     } catch (err) {
       setNotice(err.message);
     } finally {
@@ -96,6 +118,7 @@ export default function Dashboard() {
 
   const stat = status || { enabled: false, trading_mode: "DEMO", control_mode: "MANUAL", open_trades: 0 };
   const latestDecision = decisions[0];
+  const activeSession = aiSessions.find((session) => session.active);
 
   return (
     <main className="min-h-screen bg-[#f6f8f7]">
@@ -190,15 +213,52 @@ export default function Dashboard() {
                   <strong className={aiSettings?.enabled ? "text-pine" : "text-slate-600"}>{aiSettings?.enabled ? "ON" : "OFF"}</strong>
                 </div>
                 <div className="border border-slate-200 p-3">
-                  <div className="mb-1 text-slate-500">API key</div>
+                  <div className="mb-1 text-slate-500">Conexion IA</div>
                   <strong className={aiSettings?.configured ? "text-pine" : "text-coral"}>{aiSettings?.configured ? "OK" : "Falta"}</strong>
                 </div>
               </div>
               <div className="border border-slate-200 p-3 text-xs text-slate-600">
+                <div><strong>Proveedor:</strong> {aiSettings?.provider || "-"}</div>
                 <div><strong>Modelo:</strong> {aiSettings?.model || "-"}</div>
                 <div><strong>Fallback:</strong> {aiSettings?.fallback_model || "-"}</div>
+                <div><strong>Sesion:</strong> {activeSession?.title || "-"}</div>
                 <div><strong>Uso hoy:</strong> {aiCosts?.calls_used_today ?? 0}/{aiCosts?.max_calls_per_day ?? 0} llamadas</div>
                 <div><strong>Coste est.:</strong> ${Number(aiCosts?.estimated_cost_today_usd || 0).toFixed(6)}</div>
+              </div>
+              <label className="block text-xs font-medium text-slate-600">
+                Modelo principal
+                <select
+                  className="focus-ring mt-1 w-full border border-slate-300 bg-white px-3 py-2 text-sm"
+                  value={aiSettings?.model || ""}
+                  onChange={(event) => run(() => api.updateAiSettings({ model: event.target.value }))}
+                >
+                  {aiModels.map((model) => (
+                    <option key={model.id} value={model.id}>
+                      {model.label} - {model.cost_tier}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block text-xs font-medium text-slate-600">
+                Fallback
+                <select
+                  className="focus-ring mt-1 w-full border border-slate-300 bg-white px-3 py-2 text-sm"
+                  value={aiSettings?.fallback_model || ""}
+                  onChange={(event) => run(() => api.updateAiSettings({ fallback_model: event.target.value }))}
+                >
+                  {aiModels.map((model) => (
+                    <option key={model.id} value={model.id}>
+                      {model.label} - {model.cost_tier}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="max-h-32 overflow-auto border border-slate-200 p-2 text-xs text-slate-600">
+                {aiModels.map((model) => (
+                  <div key={model.id} className="border-b border-slate-100 py-1">
+                    <strong>{model.label}</strong>: {model.strength_for_trading}
+                  </div>
+                ))}
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <SwitchButton
@@ -217,6 +277,48 @@ export default function Dashboard() {
               <button className="focus-ring inline-flex w-full items-center justify-center gap-2 border border-slate-300 bg-white px-3 py-2 font-semibold" onClick={() => run(() => api.aiAnalyze({}))}>
                 <BrainCircuit size={16} /> Analizar con IA
               </button>
+              <button className="focus-ring inline-flex w-full items-center justify-center gap-2 border border-slate-300 bg-white px-3 py-2 font-semibold" onClick={() => run(() => api.createAiSession(`Sesion ${new Date().toLocaleString()}`))}>
+                Nueva sesion IA
+              </button>
+              {aiSessions.length > 0 && (
+                <label className="block text-xs font-medium text-slate-600">
+                  Sesion activa
+                  <select
+                    className="focus-ring mt-1 w-full border border-slate-300 bg-white px-3 py-2 text-sm"
+                    value={activeSession?.id || ""}
+                    onChange={(event) => run(() => api.activateAiSession(event.target.value))}
+                  >
+                    {aiSessions.map((session) => (
+                      <option key={session.id} value={session.id}>{session.title}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              <div className="space-y-2 border border-slate-200 p-3">
+                <div className="text-xs font-semibold text-slate-700">Memoria ligera</div>
+                <textarea
+                  className="focus-ring min-h-20 w-full border border-slate-300 px-3 py-2 text-xs"
+                  value={newMemory}
+                  onChange={(event) => setNewMemory(event.target.value)}
+                  placeholder="Ej: Evitar operar SOL si spread supera 0.2% durante baja liquidez."
+                />
+                <button
+                  className="focus-ring w-full border border-slate-300 bg-white px-3 py-2 text-xs font-semibold"
+                  onClick={() => run(async () => {
+                    if (!newMemory.trim()) return { message: "Memoria vacia" };
+                    await api.createAiMemory(newMemory.trim(), activeSession?.id || null);
+                    setNewMemory("");
+                    return { message: "Memoria guardada" };
+                  })}
+                >
+                  Guardar memoria
+                </button>
+                <div className="max-h-24 overflow-auto text-xs text-slate-500">
+                  {aiMemory.slice(0, 4).map((memory) => (
+                    <div key={memory.id} className="border-t border-slate-100 py-1">{memory.content}</div>
+                  ))}
+                </div>
+              </div>
               <button
                 className="focus-ring inline-flex w-full items-center justify-center gap-2 border border-slate-300 bg-white px-3 py-2 font-semibold"
                 onClick={() => run(async () => {
@@ -239,7 +341,7 @@ export default function Dashboard() {
                   {(marketIntel.tickers || []).slice(0, 5).map((ticker) => (
                     <div key={ticker.symbol} className="flex justify-between border-b border-slate-100 py-1">
                       <span>{ticker.symbol}</span>
-                      <span>{Number(ticker.last).toFixed(4)} · spread {Number(ticker.spread_pct).toFixed(3)}%</span>
+                      <span>{Number(ticker.last).toFixed(4)} / spread {Number(ticker.spread_pct).toFixed(3)}%</span>
                     </div>
                   ))}
                 </div>

@@ -1,5 +1,7 @@
 from app.models.db import (
     AiDecision,
+    AiMemory,
+    AiSession,
     AiUsage,
     AppSetting,
     BalanceSnapshot,
@@ -15,6 +17,8 @@ from app.models.db import (
 
 __all__ = [
     "AiDecision",
+    "AiMemory",
+    "AiSession",
     "AiUsage",
     "AppSetting",
     "BalanceSnapshot",

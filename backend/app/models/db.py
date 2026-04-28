@@ -171,3 +171,22 @@ class AiUsage(SQLModel, table=True):
     success: bool = False
     reason: str | None = None
     created_at: datetime = Field(default_factory=utc_now)
+
+
+class AiSession(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    title: str
+    summary: str = ""
+    active: bool = False
+    created_at: datetime = Field(default_factory=utc_now)
+    updated_at: datetime = Field(default_factory=utc_now)
+
+
+class AiMemory(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    session_id: int | None = Field(default=None, foreign_key="aisession.id")
+    content: str
+    source: str = "system"
+    confidence: float = 0.5
+    active: bool = True
+    created_at: datetime = Field(default_factory=utc_now)
