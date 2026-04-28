@@ -28,8 +28,14 @@ class Settings(BaseSettings):
 
     binance_testnet_api_key: str | None = None
     binance_testnet_secret: str | None = None
+    binance_testnet_key_type: str = "hmac"
+    binance_testnet_private_key_path: str | None = None
+    binance_testnet_private_key: str | None = None
     binance_real_api_key: str | None = None
     binance_real_secret: str | None = None
+    binance_real_key_type: str = "hmac"
+    binance_real_private_key_path: str | None = None
+    binance_real_private_key: str | None = None
 
     openrouter_api_key: str | None = None
     nvidia_api_key: str | None = None

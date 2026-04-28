@@ -9,4 +9,6 @@ node_modules/
 dist/
 *.db
 *.log
+*.pem
+*.key
 postgres_data/

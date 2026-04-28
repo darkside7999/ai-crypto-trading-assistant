@@ -6,6 +6,7 @@ Esta Fase 1 implementa solo paper trading y funciona sin Docker usando SQLite lo
 
 - El valor por defecto es `DEMO` y `MANUAL`; `REAL` no se puede activar en Fase 1.
 - El frontend nunca recibe ni guarda API keys.
+- Binance Ed25519 se soporta con private key PEM en backend; Binance no entrega secret clasico para ese tipo de clave.
 - Los logs pasan por una funcion de redaccion para campos con `secret`, `token`, `key`, `password` o `signature`.
 - Telegram guarda resultado de envio, pero no expone tokens.
 - El bot no ejecuta ordenes reales; registra ordenes `paper` en `exchange_order`.

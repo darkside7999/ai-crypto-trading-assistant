@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from pathlib import Path
 
 from app.config import get_settings
 
@@ -28,9 +29,24 @@ class BinanceMarketData:
 
         self.exchange = ccxt.binance({"enableRateLimit": True})
         self.exchange.set_sandbox_mode(True)
-        if settings.binance_testnet_api_key and settings.binance_testnet_secret:
+        secret = self._testnet_secret(settings)
+        if settings.binance_testnet_api_key and secret:
             self.exchange.apiKey = settings.binance_testnet_api_key
-            self.exchange.secret = settings.binance_testnet_secret
+            self.exchange.secret = secret
+
+    def _testnet_secret(self, settings) -> str | None:
+        if settings.binance_testnet_key_type.lower() == "ed25519":
+            return self._load_private_key(settings.binance_testnet_private_key, settings.binance_testnet_private_key_path)
+        return settings.binance_testnet_secret
+
+    def _load_private_key(self, value: str | None, path: str | None) -> str | None:
+        if value:
+            return value.replace("\\n", "\n")
+        if path:
+            key_path = Path(path).expanduser()
+            if key_path.exists():
+                return key_path.read_text(encoding="utf-8")
+        return None
 
     def fetch_tickers(self, symbols: list[str]) -> list[MarketTicker]:
         raw = self.exchange.fetch_tickers(symbols)

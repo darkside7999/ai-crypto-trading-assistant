@@ -282,9 +282,34 @@ Modelos disponibles desde el menu:
 
 El dashboard permite cambiar modelo principal/fallback, crear sesiones nuevas para no saturar contexto y guardar memorias ligeras. La app no deja que el modelo navegue libremente: recibe datos ya filtrados por backend.
 
-## Binance sin secret
+## Binance sin secret o Ed25519
 
-Una API key de Binance sin `secret` sirve como maximo para datos publicos o usos no firmados. Para Binance Spot Testnet con ordenes hace falta `API key + secret`, porque las ordenes requieren firma. Mientras no tengas secret, usa:
+Una API key de Binance sin `secret` clasico puede ser normal si elegiste **Ed25519**. En Ed25519 Binance te da el `API key`, pero el secreto real es tu **private key PEM**, generada por ti. Binance guarda/verifica la public key.
+
+Para generar un par Ed25519 en Linux Mint:
+
+```bash
+./scripts/linux/generate-binance-ed25519-key.sh
+```
+
+El script crea:
+
+```text
+secrets/binance_ed25519_private.pem
+secrets/binance_ed25519_public.pem
+```
+
+Pega la public key en Binance/Testnet al crear la API. Cuando Binance te de el API key, configura:
+
+```env
+BINANCE_TESTNET_KEY_TYPE=ed25519
+BINANCE_TESTNET_API_KEY=tu_api_key_de_binance
+BINANCE_TESTNET_PRIVATE_KEY_PATH=/ruta/al/proyecto/secrets/binance_ed25519_private.pem
+```
+
+No subas nunca la private key. El repo ignora `*.pem` y `*.key`.
+
+Si no tienes private key o no puedes crear Binance Testnet todavia, usa:
 
 ```env
 MARKET_DATA_PROVIDER=kraken_public
